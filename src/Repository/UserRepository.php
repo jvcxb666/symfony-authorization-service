@@ -30,4 +30,13 @@ class UserRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getArrayResult()[0] ?? null;
     }
+
+    public function deleteById(string $id): void
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->delete("App\Entity\User","u")
+            ->andWhere("u.id = '{$id}'")
+                ->getQuery()
+                    ->execute();
+    }
 }
