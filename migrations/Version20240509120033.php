@@ -21,6 +21,9 @@ final class Version20240509120033 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE "user" (id UUID NOT NULL, first_name VARCHAR(255) DEFAULT NULL, last_name VARCHAR(255) DEFAULT NULL, middle_name VARCHAR(255) DEFAULT NULL, username VARCHAR(255) NOT NULL, email VARCHAR(255) DEFAULT NULL, phone VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
+        $this->addSql('CREATE INDEX user_phone ON "user" (phone)');
+        $this->addSql('CREATE INDEX user_email ON "user" (email)');
+        $this->addSql('CREATE INDEX user_username ON "user" (username)');
     }
 
     public function down(Schema $schema): void
