@@ -2,13 +2,14 @@
 
 namespace App\Entity;
 
+use App\Interface\ModelInterface;
 use App\Repository\TokenRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 
 #[ORM\Entity(repositoryClass: TokenRepository::class)]
-class Token
+class Token implements ModelInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: Types::GUID)]

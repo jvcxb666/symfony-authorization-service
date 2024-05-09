@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Interface\ModelInterface;
 use App\Repository\UserRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -9,7 +10,7 @@ use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-class User
+class User implements ModelInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: Types::GUID)]
