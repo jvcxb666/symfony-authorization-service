@@ -15,4 +15,19 @@ class UserRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, User::class);
     }
+
+    public function findOneByAnyCredit(array $data): array|null
+    {
+        if(empty($data['email']) && empty($data['phone']) && empty($data['username'])) return null;
+
+        $qb = $this->getEntityManager()->createQueryBuilder();
+
+        $qb->select("u")->from("App\Entity\User","u");
+        if(!empty($data['email'])) $qb->andWhere("u.email = '{$data['email']}'");
+        if(!empty($data['phone'])) $qb->andWhere("u.phone = '{$data['phone']}'");
+        if(!empty($data['username'])) $qb->andWhere("u.username = '{$data['username']}'");
+        $qb->setMaxResults(1);
+
+        return $qb->getQuery()->getArrayResult()[0] ?? null;
+    }
 }
