@@ -36,6 +36,9 @@ class User implements ModelInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $phone = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $password = null;
+
     public function getId(): ?string
     {
         return $this->id;
@@ -109,6 +112,18 @@ class User implements ModelInterface
     public function setPhone(?string $phone): static
     {
         $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
 
         return $this;
     }
