@@ -15,4 +15,13 @@ class TokenRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Token::class);
     }
+
+    public function deleteUserTokens(string $user_id): void
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->delete("App\Entity\Token","t")
+            ->andWhere("t.user_id = '{$user_id}'")
+                ->getQuery()
+                    ->execute();
+    }
 }

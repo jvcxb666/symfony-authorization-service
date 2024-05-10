@@ -34,6 +34,7 @@ class TokenAuthService extends AbstractAuthService implements TokenServiceInterf
             if($this->base->login($request))
             {
                 $user_id = $this->em->getRepository(User::class)->findOneByAnyCredit($request)['id'];
+                $this->repository->deleteUserTokens($user_id);
                 return $this->createToken($user_id);
             }else{
                 throw new Exception("Wrong authorization credits");
@@ -71,7 +72,6 @@ class TokenAuthService extends AbstractAuthService implements TokenServiceInterf
     private function createToken(string $user_id): Token
     {
         $token = new Token();
-        
         $token->setUserId($user_id);
         $this->createTokens($token);
         $this->em->persist($token);
