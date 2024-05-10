@@ -96,6 +96,6 @@ class UserService implements AuthorizationServiceInterface
             $check = $this->repository->findOneBy(["phone"=>$data['phone']]);
             if(!empty($check) && $check->getId() != $data['id'] ?? 0) throw new Exception("Phone is already taken");
         }
-        if(empty($data['id']) && empty($data['password'] && empty($data['username']))) throw new Exception("Missing required fields");
+        if(empty($data['id']) && (empty($data['password']) && empty($data['username']))) throw new Exception("Missing required fields");
     }
 }
