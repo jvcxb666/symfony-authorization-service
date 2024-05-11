@@ -73,7 +73,7 @@ class TokenAuthService extends AbstractAuthService implements TokenServiceInterf
     {
         $token = new Token();
         $token->setUserId($user_id);
-        $this->createTokens($token);
+        $this->generateTokens($token);
         $this->em->persist($token);
         $this->em->flush();
 
@@ -93,14 +93,14 @@ class TokenAuthService extends AbstractAuthService implements TokenServiceInterf
             throw new Exception("Token refresh is expired");
         }
 
-        $this->createTokens($token);
+        $this->generateTokens($token);
         $this->em->persist($token);
         $this->em->flush();
 
         return $token;
     }
 
-    private function createTokens(Token &$token): void
+    private function generateTokens(Token &$token): void
     {
         $user_id = $token->getUserId();
         $token->setValue(JWT::encode(["type=access","user_id"=>$user_id],"user_{$user_id}",static::ALOGORITHM));
