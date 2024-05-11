@@ -9,6 +9,7 @@ use App\Interface\ModelInterface;
 use App\Interface\TokenServiceInterface;
 use App\Repository\TokenRepository;
 use App\Service\AbstractAuthService;
+use App\Utils\Exception\TokenUnauthorizedException;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -68,9 +69,9 @@ class TokenAuthService extends AbstractAuthService implements TokenServiceInterf
     {
         $token = str_replace("Bearer ","",$token ?? "");
         $token = $this->repository->findOneBy(['value'=>$token]);
-        if(empty($token)) throw new Exception("Bad token");
+        if(empty($token)) throw new TokenUnauthorizedException("Bad token");
         $this->validateToken($token);
-        if($token->getExpired()->format("Y-m-d H:i:s") < date("Y-m-d H:i:s")) throw new Exception("Token is expired");
+        if($token->getExpired()->format("Y-m-d H:i:s") < date("Y-m-d H:i:s")) throw new TokenUnauthorizedException("Token is expired");
 
         return true;
     }
@@ -89,14 +90,14 @@ class TokenAuthService extends AbstractAuthService implements TokenServiceInterf
     private function refreshToken(array $request): Token
     {
         $token = $this->repository->findOneBy(['refresh'=>$request['refresh']]);
-        if(empty($token)) throw new Exception("Token is not found");
+        if(empty($token)) throw new TokenUnauthorizedException("Token is not found");
 
         $this->validateToken($token);
 
         if($token->getRefreshExpired()->format("Y-m-d H:i:s") < date("Y-m-d H:i:s")) {
             $this->em->remove($token);
             $this->em->flush();
-            throw new Exception("Token refresh is expired");
+            throw new TokenUnauthorizedException("Token refresh is expired");
         }
 
         $this->generateTokens($token);
@@ -127,7 +128,7 @@ class TokenAuthService extends AbstractAuthService implements TokenServiceInterf
         } catch (Exception $e) {
             $this->em->remove($token);
             $this->em->flush();
-            throw new Exception("Invalid token");
+            throw new TokenUnauthorizedException("Invalid token");
         }
     }
 }

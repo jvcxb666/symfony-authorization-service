@@ -30,11 +30,13 @@ class TokenController extends AbstractController
     {
         try{
             $result = $this->service->createOrRefreshToken($request->get("data"));
+            $status_code = 200;
         } catch(Exception $e) {
             $result = ["error" => $e->getMessage()];
+            $status_code = $e->getCode() == 401 ? $e->getCode() : 200;
         }
         
-        return $this->json($result);
+        return $this->json($result,$status_code);
     }
 
     #[Route('v1/token/', name: 'app_dropToken', methods: "DELETE")]
@@ -42,12 +44,13 @@ class TokenController extends AbstractController
     {
         try{
             $this->service->dropToken($request->headers->get("Authorization"));
-            $result = true;
+            $status_code = 200;
         } catch(Exception $e) {
             $result = ["error" => $e->getMessage()];
+            $status_code = $e->getCode() == 401 ? $e->getCode() : 200;
         }
         
-        return $this->json($result);
+        return $this->json($result,$status_code);
     }
 
     #[Route('v1/token/check/', name: 'app_checkToken', methods: "POST")]
@@ -55,10 +58,12 @@ class TokenController extends AbstractController
     {
         try{
             $result = $this->service->checkToken($request->headers->get("Authorization"));
+            $status_code = 200;
         } catch(Exception $e) {
             $result = ["error" => $e->getMessage()];
+            $status_code = $e->getCode() == 401 ? $e->getCode() : 200;
         }
         
-        return $this->json($result);
+        return $this->json($result,$status_code);
     }
 }
