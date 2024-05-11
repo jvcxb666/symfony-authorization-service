@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Token;
 use App\Entity\User;
+use App\Interface\AuthorizationServiceInterface;
 use App\Interface\ModelInterface;
 use App\Interface\TokenServiceInterface;
 use App\Repository\TokenRepository;
@@ -25,6 +26,11 @@ class TokenAuthService extends AbstractAuthService implements TokenServiceInterf
         $this->em = $entityManagerInterface;
         $this->repository = $this->em->getRepository(Token::class);
         parent::__construct($userService);
+    }
+
+    public function getUserService(): AuthorizationServiceInterface
+    {
+        return $this->base;
     }
 
     public function createOrRefreshToken(array $request): ModelInterface|null
