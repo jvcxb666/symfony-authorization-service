@@ -38,7 +38,7 @@ class UserController extends AbstractController
     public function getUserById(Request $request,string $id): JsonResponse
     {
         try{
-            $this->service->checkToken($request->headers->get("Authorization"));
+            $this->service->checkToken($request->headers->get("Authorization") ?? "");
             $result = $this->service->getUserService()->findOne(["id"=>$id]);
             $status_code = 200;
         } catch(Exception $e) {

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Interface\TokenServiceInterface;
 use App\Service\TokenAuthService;
+use App\Utils\CacheAdapter;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -29,7 +30,7 @@ class TokenController extends AbstractController
     public function getToken(Request $request): JsonResponse
     {
         try{
-            $result = $this->service->createOrRefreshToken($request->get("data"));
+            $result = $this->service->createOrRefreshToken($request->get("data") ?? []);
             $status_code = 200;
         } catch(Exception $e) {
             $result = ["error" => $e->getMessage()];
@@ -43,7 +44,7 @@ class TokenController extends AbstractController
     public function dropToken(Request $request): JsonResponse
     {
         try{
-            $this->service->dropToken($request->headers->get("Authorization"));
+            $this->service->dropToken($request->headers->get("Authorization") ?? "");
             $status_code = 200;
         } catch(Exception $e) {
             $result = ["error" => $e->getMessage()];
@@ -57,7 +58,7 @@ class TokenController extends AbstractController
     public function checkToken(Request $request): JsonResponse
     {
         try{
-            $result = $this->service->checkToken($request->headers->get("Authorization"));
+            $result = $this->service->checkToken($request->headers->get("Authorization") ?? "");
             $status_code = 200;
         } catch(Exception $e) {
             $result = ["error" => $e->getMessage()];
