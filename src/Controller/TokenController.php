@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Interface\TokenServiceInterface;
 use App\Service\TokenAuthService;
-use App\Utils\CacheAdapter;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
