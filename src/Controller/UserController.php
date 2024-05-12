@@ -23,7 +23,7 @@ class UserController extends AbstractController
     public function getList(Request $request): JsonResponse
     {
         try{
-            $this->service->checkToken($request->headers->get("Authorization"));
+            $this->service->checkToken($request->headers->get("Authorization") ?? "");
             $result = $this->service->getUserService()->find($request->get("data") ?? []);
             $status_code = 200;
         } catch(Exception $e) {
@@ -53,7 +53,7 @@ class UserController extends AbstractController
     public function saveUser(Request $request): JsonResponse
     {
         try{
-            if(!empty($request->get("data")['id']) )$this->service->checkToken($request->headers->get("Authorization"));
+            if(!empty($request->get("data")['id']) )$this->service->checkToken($request->headers->get("Authorization") ?? "");
             $result = $this->service->getUserService()->save($request->get("data") ?? []);
             $status_code = 200;
         } catch(Exception $e) {
@@ -68,7 +68,7 @@ class UserController extends AbstractController
     public function delete(Request $request): JsonResponse
     {
         try{
-            $this->service->checkToken($request->headers->get("Authorization"));
+            $this->service->checkToken($request->headers->get("Authorization") ?? "");
             $this->service->getUserService()->delete($request->get("data") ?? []);
             $result = true;
             $status_code = 200;
