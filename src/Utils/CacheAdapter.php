@@ -16,10 +16,10 @@ class CacheAdapter
         $this->client = new Client("tcp://authredis:6379");
     }
 
-    public function get(string $key): array|null
+    public function get(string $key, string $type = null): mixed
     {
         $string = $this->client->get($key);
-        return json_decode($string,1);
+        return empty($type) ? json_decode($string,1) : $this->serializer->deserialize($string,$type,"json");
     }
 
     public function delete(string $key): void
@@ -27,7 +27,7 @@ class CacheAdapter
         $this->client->del($key);
     }
 
-    public function save(string $key, string|array $value): void
+    public function save(string $key, mixed $value): void
     {
         $value = $this->serializer->serialize($value,"json");
 
