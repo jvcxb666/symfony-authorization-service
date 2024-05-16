@@ -24,4 +24,14 @@ class TokenRepository extends ServiceEntityRepository
                 ->getQuery()
                     ->execute();
     }
+
+    public function removeExpiredTokens(): void
+    {
+        $date = date("Y-m-d H:i:s");
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->delete("App\Entity\Token","t")
+            ->andWhere("t.refresh_expired < '{$date}'")
+                ->getQuery()
+                    ->execute();
+    }
 }
