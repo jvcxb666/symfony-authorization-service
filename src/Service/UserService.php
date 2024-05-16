@@ -6,7 +6,7 @@ use App\Entity\User;
 use App\Interface\AuthorizationServiceInterface;
 use App\Interface\ModelInterface;
 use App\Repository\UserRepository;
-use App\Utils\CacheAdapter;
+use App\Utils\Redis\CacheAdapter;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
