@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Interface\AuthorizationServiceInterface;
 use App\Interface\ModelInterface;
 use App\Repository\UserRepository;
+use App\Utils\CacheAdapter;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
@@ -18,36 +19,51 @@ class UserService implements AuthorizationServiceInterface
     private EntityManagerInterface $em;
     private UserRepository $repository;
     private PasswordHasherInterface $hasher;
+    private CacheAdapter $cacher;
 
-    public function __construct(EntityManagerInterface $entityManagerInterface)
+    public function __construct(EntityManagerInterface $entityManagerInterface,CacheAdapter $cacheAdapter)
     {
         $this->hasher = new SodiumPasswordHasher();
         $this->em = $entityManagerInterface;
         $this->repository = $this->em->getRepository(User::class);
+        $this->cacher = $cacheAdapter;
     }
 
     public function login(array $request): bool|string
     {
+        $key = "user_login_".json_encode($request);
+        if(!empty($this->cacher->get($key))) return boolval($this->cacher->get($key));
         $result = false;
         $user = $this->repository->findOneByAnyCredit($request);
         if(!empty($user)) $result = $this->hasher->verify($user['password'],$request['password']);
+        $this->cacher->save($key,strval($result));
         return $result;
     }
 
     public function find(array $request): array|null
     {
-        return $this->repository->findBy($request);
+        $key = "user_find_".(!empty($request) ? json_encode($request) : "all");
+        if(!empty($this->cacher->get($key))) return $this->cacher->get($key);
+        $result = $this->repository->findBy($request);
+        $this->cacher->save($key,$result);
+        return $result;
     }
 
     public function findOne(array $request): ModelInterface|null
     {
-        return $this->repository->findOneBy($request);
+        $key = "user_get_".json_encode($request);
+        if(!empty($this->cacher->get($key))) return $this->cacher->get($key,User::class);
+        $result = $this->repository->findOneBy($request);
+        $this->cacher->save($key,$result);
+        return $result;
     }
 
     public function delete(array $request): void
     {
         if(!empty($request['id'])) {
             $this->repository->deleteById($request['id']);
+            $this->cacher->deleteByParts(["user_",$request['id']]);
+            $this->cacher->deleteByParts(["user_login"]);
         }else{
             throw new Exception("Missing required id");
         }
@@ -73,6 +89,8 @@ class UserService implements AuthorizationServiceInterface
 
         $this->em->persist($model);
         $this->em->flush();
+        $this->cacher->deleteByParts(["user_",$model->getId()]);
+        $this->cacher->deleteByParts(["user_login"]);
 
         return $model;
     }
