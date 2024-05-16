@@ -3,13 +3,16 @@
 namespace App\Utils;
 
 use Predis\Client;
+use Symfony\Component\Serializer\SerializerInterface;
 
 class CacheAdapter
 {
     private Client $client;
+    private SerializerInterface $serializer;
 
-    public function __construct()
+    public function __construct(SerializerInterface $serializerInterface)
     {
+        $this->serializer = $serializerInterface;
         $this->client = new Client("tcp://authredis:6379");
     }
 
@@ -26,7 +29,7 @@ class CacheAdapter
 
     public function save(string $key, string|array $value): void
     {
-        if(is_array($value)) json_encode($value);
+        $value = $this->serializer->serialize($value,"json");
 
         $this->client->set($key,$value);
     }
