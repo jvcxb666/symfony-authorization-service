@@ -7,6 +7,7 @@ use App\Interface\AuthorizationServiceInterface;
 use App\Interface\ModelInterface;
 use App\Repository\UserRepository;
 use App\Utils\Redis\CacheAdapter;
+use App\Utils\Redis\QueueAdapter;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\PasswordHasher\Hasher\SodiumPasswordHasher;
@@ -20,6 +21,7 @@ class UserService implements AuthorizationServiceInterface
     private UserRepository $repository;
     private PasswordHasherInterface $hasher;
     private CacheAdapter $cacher;
+    private QueueAdapter $queue;
 
     public function __construct(EntityManagerInterface $entityManagerInterface,CacheAdapter $cacheAdapter)
     {
@@ -27,6 +29,7 @@ class UserService implements AuthorizationServiceInterface
         $this->em = $entityManagerInterface;
         $this->repository = $this->em->getRepository(User::class);
         $this->cacher = $cacheAdapter;
+        $this->queue = new QueueAdapter();
     }
 
     public function login(array $request): bool|string
@@ -64,6 +67,7 @@ class UserService implements AuthorizationServiceInterface
             $this->repository->deleteById($request['id']);
             $this->cacher->deleteByParts(["user_",$request['id']]);
             $this->cacher->deleteByParts(["user_login"]);
+            $this->queue->push(["action"=>"bash","content"=>"php bin/console tokens:clear {$request['id']}"]);
         }else{
             throw new Exception("Missing required id");
         }
