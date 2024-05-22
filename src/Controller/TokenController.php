@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Interface\TokenServiceInterface;
 use App\Service\TokenAuthService;
+use App\Utils\Redis\QueueAdapter;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,10 +14,12 @@ use Symfony\Component\Routing\Attribute\Route;
 class TokenController extends AbstractController
 {
     private TokenServiceInterface $service;
+    private QueueAdapter $queue;
 
     public function __construct(TokenAuthService $tokenAuthService)
     {
         $this->service = $tokenAuthService;
+        $this->queue = new QueueAdapter();
     }
 
     #[Route('/', name: 'app_index')]
@@ -59,6 +62,7 @@ class TokenController extends AbstractController
         try{
             $result = $this->service->checkToken($request->headers->get("Authorization") ?? "");
             $status_code = 200;
+            $this->queue->push(["action"=>"bash","content"=>"php bin/console tokens:clear expired"]);
         } catch(Exception $e) {
             $result = ["error" => $e->getMessage()];
             $status_code = $e->getCode() == 401 ? $e->getCode() : 200;

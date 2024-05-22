@@ -6,7 +6,8 @@ RUN apt-get update && apt-get install -y locales wget nano curl libpq-dev libzip
 RUN docker-php-ext-install curl \
     && docker-php-ext-install pdo \
     && docker-php-ext-install pdo_pgsql \
-    && docker-php-ext-install pgsql
+    && docker-php-ext-install pgsql \
+    && docker-php-ext-install pcntl
   
 RUN curl -sS https://getcomposer.org/installer -o composer-setup.php
 RUN php composer-setup.php --install-dir=/usr/local/bin --filename=composer

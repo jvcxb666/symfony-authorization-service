@@ -1,19 +1,17 @@
 <?php
 
-namespace App\Utils;
+namespace App\Utils\Redis;
 
-use Predis\Client;
 use Symfony\Component\Serializer\SerializerInterface;
 
-class CacheAdapter
+class CacheAdapter extends AbstractRedisConnection
 {
-    private Client $client;
     private SerializerInterface $serializer;
 
     public function __construct(SerializerInterface $serializerInterface)
     {
+        parent::__construct();
         $this->serializer = $serializerInterface;
-        $this->client = new Client("tcp://authredis:6379");
     }
 
     public function get(string $key, string $type = null): mixed
